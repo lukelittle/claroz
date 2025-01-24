@@ -1,0 +1,102 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Home - Claroz{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="row">
+    {% for post in posts %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <a href="{% url 'posts:detail' post.id %}" class="text-decoration-none">
+                    {% if post.image_cid %}
+                        <img src="{{ post.get_ipfs_url }}" 
+                             class="card-img-top post-image" 
+                             alt="{{ post.caption }}"
+                             onerror="this.onerror=null; this.src='/media/default-post.jpg';">
+                    {% else %}
+                        <img src="/media/default-post.jpg" class="card-img-top post-image" alt="No image available">
+                    {% endif %}
+                </a>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        {% if post.profile.profile_picture_cid %}
+                            <img src="{{ post.profile.get_ipfs_url }}" 
+                                 class="rounded-circle me-2" 
+                                 width="32" height="32" 
+                                 alt="{{ post.profile.user.username }}"
+                                 onerror="this.onerror=null; this.src='/media/default-profile.jpg';">
+                        {% else %}
+                            <img src="/media/default-profile.jpg" 
+                                 class="rounded-circle me-2" 
+                                 width="32" height="32" 
+                                 alt="{{ post.profile.user.username }}">
+                        {% endif %}
+                        <a href="{% url 'posts:profile_posts' post.profile.user.username %}" class="text-decoration-none text-dark">
+                            <strong>{{ post.profile.user.username }}</strong>
+                        </a>
+                    </div>
+                    
+                    <p class="card-text text-truncate">{{ post.caption }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <span class="like-button me-3 {% if user.is_authenticated and user.profile in post.likes.all %}liked{% endif %}" 
+                                  data-post-id="{{ post.id }}">
+                                <i class="{% if user.is_authenticated and user.profile in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i>
+                                <span class="ms-1 likes-count">{{ post.likes.count }}</span>
+                            </span>
+                            <span>
+                                <i class="far fa-comment"></i>
+                                <span class="ms-1">{{ post.comments.count }}</span>
+                            </span>
+                        </div>
+                        <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No posts yet. 
+                {% if user.is_authenticated %}
+                    <a href="{% url 'posts:create' %}">Create the first post!</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Log in</a> to create a post!
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

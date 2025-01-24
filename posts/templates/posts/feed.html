@@ -1,0 +1,117 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Activity Feed</h2>
+    
+    {% if federation_enabled %}
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-globe"></i> Federation is enabled - showing posts from connected AT Protocol servers
+        </div>
+    {% endif %}
+    
+    {% if posts %}
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 post-card">
+                        {% if post.is_federated %}
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-globe me-2"></i>
+                                    <span class="text-muted small">Federated Post</span>
+                                </div>
+                                <div class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        {{ post.profile.display_name }}
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-globe"></i> {{ post.profile.federation_handle }}
+                                        </small>
+                                    </a>
+                                </div>
+                                <p class="card-text">{{ post.caption }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                    <div>
+                                        <small class="text-muted me-2">{{ post.likes_count }} likes</small>
+                                        <small class="text-muted">{{ post.comments_count }} comments</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'posts:detail' post.id %}" class="post-image-link">
+                                {% if post.image_cid %}
+                                    <img src="{{ post.get_ipfs_url }}" 
+                                         class="card-img-top post-image" 
+                                         alt="{{ post.caption }}"
+                                         onerror="this.onerror=null; this.src='/media/default-post.jpg';">
+                                {% else %}
+                                    <img src="/media/default-post.jpg" 
+                                         class="card-img-top post-image" 
+                                         alt="No image available">
+                                {% endif %}
+                                <div class="post-overlay">
+                                    <div class="post-stats">
+                                        <span><i class="bi bi-heart-fill"></i> {{ post.likes.count }}</span>
+                                        <span><i class="bi bi-chat-fill"></i> {{ post.comments.count }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <a href="{% url 'posts:profile' post.profile.user.username %}" class="text-decoration-none">
+                                        {{ post.profile.user.username }}
+                                    </a>
+                                </div>
+                                <p class="card-text text-truncate">{{ post.caption }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                    <div>
+                                        <small class="text-muted me-2">{{ post.likes.count }} likes</small>
+                                        <small class="text-muted">{{ post.comments.count }} comments</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <p>No posts yet from profiles you follow.</p>
+            <p>Start following other users to see their posts in your feed!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

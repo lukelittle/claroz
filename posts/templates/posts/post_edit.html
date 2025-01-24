@@ -1,0 +1,40 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Edit Post - Claroz{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Edit Post</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <img src="{{ post.image.url }}" class="img-fluid rounded" alt="{{ post.caption }}">
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="caption" class="form-label">Caption</label>
+                        <textarea class="form-control" id="caption" name="caption" rows="3">{{ post.caption }}</textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'posts:detail' post.id %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
