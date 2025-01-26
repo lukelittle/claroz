@@ -1,54 +1,65 @@
-# Python
-*.py[cod]
-__pycache__/
+# Go specific
+*.exe
+*.exe~
+*.dll
 *.so
-.Python
+*.dylib
+*.test
+*.out
+/vendor/
+go.work
+
+# Node/React specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+coverage/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# Virtual Environment
-venv/
-ENV/
-env/
-.env/
-
-# IDE
+# IDE/Editor
 .idea/
 .vscode/
 *.swp
 *.swo
-.project
-.pydevproject
-.settings
-
-# OS
+*~
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-# Project specific
-cookies.txt
+# Environment files
+.env
+*.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+log/
+
+# Build directories
+bin/
+tmp/
+
+# Test coverage
+*.cover
+coverage.txt
+coverage.html
+
+# Uploads directory content but keep directory
+uploads/*
+!uploads/.gitkeep
+
+# Cypress
+cypress/screenshots/
+cypress/videos/

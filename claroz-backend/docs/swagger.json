@@ -1,0 +1,701 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A RESTful API for the Claroz social platform",
+        "title": "Claroz API",
+        "termsOfService": "https://claroz.com/terms",
+        "contact": {
+            "name": "API Support",
+            "url": "https://claroz.com/support",
+            "email": "lucas.little@claroz.com"
+        },
+        "license": {
+            "name": "Proprietary",
+            "url": "https://claroz.com/license"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "schemes": ["http"],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Authenticate user with email and password",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["auth"],
+                "summary": "Login user",
+                "parameters": [{
+                    "description": "Login credentials",
+                    "name": "request",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/handlers.LoginRequest"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Register a new user with username, email, and password",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["auth"],
+                "summary": "Register a new user",
+                "parameters": [{
+                    "description": "Registration details",
+                    "name": "request",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/handlers.RegisterRequest"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or email already registered",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [{"Bearer": []}],
+                "description": "Get the currently authenticated user's details",
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Get current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "description": "Retrieve a user by their UUID",
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Get user by ID",
+                "parameters": [{
+                    "type": "string",
+                    "description": "User ID (UUID)",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [{"Bearer": []}],
+                "description": "Update an existing user's information",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Update user details",
+                "parameters": [{
+                    "type": "string",
+                    "description": "User ID (UUID)",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }, {
+                    "description": "Updated user details",
+                    "name": "user",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [{"Bearer": []}],
+                "description": "Delete a user by their ID",
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Delete user",
+                "parameters": [{
+                    "type": "string",
+                    "description": "User ID (UUID)",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/posts": {
+            "get": {
+                "description": "Retrieve a list of posts with pagination support",
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Get posts with pagination",
+                "parameters": [{
+                    "type": "integer",
+                    "description": "Page number (default: 1)",
+                    "name": "page",
+                    "in": "query",
+                    "minimum": 1
+                }, {
+                    "type": "integer",
+                    "description": "Page size (default: 10, max: 50)",
+                    "name": "pageSize",
+                    "in": "query",
+                    "minimum": 1,
+                    "maximum": 50
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Post"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [{"Bearer": []}],
+                "description": "Create a new post with an image and caption",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Create a new post",
+                "parameters": [{
+                    "type": "file",
+                    "description": "Image file",
+                    "name": "image",
+                    "in": "formData",
+                    "required": true
+                }, {
+                    "type": "string",
+                    "description": "Post caption",
+                    "name": "caption",
+                    "in": "formData"
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Post"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/{id}": {
+            "get": {
+                "description": "Retrieve a single post by its ID",
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Get a post by ID",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Post ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Post"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [{"Bearer": []}],
+                "description": "Delete a post by ID (only by post owner)",
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Delete a post",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Post ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/{id}/comments": {
+            "post": {
+                "security": [{"Bearer": []}],
+                "description": "Add a new comment to a specific post",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Add a comment to a post",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Post ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }, {
+                    "description": "Comment content",
+                    "name": "comment",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/handlers.CommentRequest"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/{id}/like": {
+            "post": {
+                "security": [{"Bearer": []}],
+                "description": "Add a like to a specific post",
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Like a post",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Post ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [{"Bearer": []}],
+                "description": "Remove a like from a specific post",
+                "produces": ["application/json"],
+                "tags": ["posts"],
+                "summary": "Unlike a post",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Post ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/follow": {
+            "post": {
+                "security": [{"Bearer": []}],
+                "description": "Follow another user",
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Follow a user",
+                "parameters": [{
+                    "type": "string",
+                    "description": "User ID to follow",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [{"Bearer": []}],
+                "description": "Unfollow a previously followed user",
+                "produces": ["application/json"],
+                "tags": ["users"],
+                "summary": "Unfollow a user",
+                "parameters": [{
+                    "type": "string",
+                    "description": "User ID to unfollow",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/federation/resolve/{handle}": {
+            "get": {
+                "description": "Resolves a remote profile from a federated handle (e.g. user.bsky.social)",
+                "produces": ["application/json"],
+                "tags": ["federation"],
+                "summary": "Resolve a remote profile by handle",
+                "parameters": [{
+                    "type": "string",
+                    "description": "Remote handle to resolve",
+                    "name": "handle",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/federation/sync/{did}": {
+            "post": {
+                "description": "Syncs the latest data for a remote profile",
+                "produces": ["application/json"],
+                "tags": ["federation"],
+                "summary": "Sync a remote profile",
+                "parameters": [{
+                    "type": "string",
+                    "description": "DID of the remote profile",
+                    "name": "did",
+                    "in": "path",
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.LoginRequest": {
+            "type": "object",
+            "required": ["email", "password"],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "lucas.little@claroz.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password123"
+                }
+            }
+        },
+        "handlers.RegisterRequest": {
+            "type": "object",
+            "required": ["username", "email", "password"],
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "example": "lucas"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "lucas.little@claroz.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password123"
+                },
+                "full_name": {
+                    "type": "string",
+                    "example": "Lucas Little"
+                }
+            }
+        },
+        "handlers.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "handlers.CommentRequest": {
+            "type": "object",
+            "required": ["content"],
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Great post!"
+                }
+            }
+        },
+        "handlers.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Operation completed successfully"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "lucas"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "lucas.little@claroz.com"
+                },
+                "full_name": {
+                    "type": "string",
+                    "example": "Lucas Little"
+                },
+                "bio": {
+                    "type": "string",
+                    "example": "Software engineer at Claroz"
+                },
+                "avatar": {
+                    "type": "string",
+                    "example": "https://claroz.com/avatars/lucas.jpg"
+                },
+                "did": {
+                    "type": "string",
+                    "example": "did:web:claroz.com:lucas"
+                },
+                "handle": {
+                    "type": "string",
+                    "example": "@lucas"
+                },
+                "federation_type": {
+                    "type": "string",
+                    "example": "local"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-26T00:35:27Z"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-26T00:35:27Z"
+                }
+            }
+        },
+        "models.Post": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "caption": {
+                    "type": "string",
+                    "example": "Beautiful sunset!"
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "https://claroz.com/images/sunset.jpg"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-26T00:35:27Z"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-26T00:35:27Z"
+                }
+            }
+        },
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "post_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "content": {
+                    "type": "string",
+                    "example": "Great post!"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-26T00:35:27Z"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Type \"Bearer\" followed by a space and JWT token."
+        }
+    }
+}
